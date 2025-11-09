@@ -41,6 +41,26 @@ AMyProject415Projectile::AMyProject415Projectile()
 	InitialLifeSpan = 3.0f;
 }
 
+void AMyProject415Projectile::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	// Generate a random color for the projectile and decal
+	RandomColor = FLinearColor(
+		UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f),
+		UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f),
+		UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f),
+		1.0f
+	);
+
+	// Create dynamic material instance and set the color parameter for the ball mesh
+	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(ProjectileMaterial, this);
+	BallMesh->SetMaterial(0, DynamicMaterialInstance);
+
+	// Set the random color parameter for the projectile material
+	DynamicMaterialInstance->SetVectorParameterValue(TEXT("Color"), RandomColor);
+}
+
 void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
@@ -52,26 +72,20 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	}
 
 	// If we hit something, and we have a decal material
-	if (OtherActor != nullptr && BaseMaterial != nullptr)
+	if (OtherActor != nullptr && DecalMaterial != nullptr)
 	{
 		// Generate random values for color, frame, and size
-		float ranNumX = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
-		float ranNumY = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
-		float ranNumZ = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
 		float ranNumFrame = UKismetMathLibrary::RandomFloatInRange(0.0f, 3.0f);
 		float ranNumSize = UKismetMathLibrary::RandomFloatInRange(20.0f, 40.0f);
 
-		// Create color vector
-		FVector4 ColorVector = FVector4(ranNumX, ranNumY, ranNumZ, 1.0f);
-		
 		// Spawn decal at hit location
-		auto Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), BaseMaterial, FVector(ranNumSize), Hit.Location, Hit.Normal.Rotation(), 0.f);
+		auto Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalMaterial, FVector(ranNumSize), Hit.Location, Hit.Normal.Rotation(), 0.f);
 		
 		// Create dynamic material instance and set parameters
 		auto MaterialInstance = Decal->CreateDynamicMaterialInstance();
 
 		// Set decal parameters
-		MaterialInstance->SetVectorParameterValue("Color", ColorVector);
-		MaterialInstance->SetScalarParameterValue("Frame", ranNumFrame);
+		MaterialInstance->SetVectorParameterValue(TEXT("Color"), RandomColor);
+		MaterialInstance->SetScalarParameterValue(TEXT("Frame"), ranNumFrame);
 	}
 }

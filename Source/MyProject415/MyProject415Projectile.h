@@ -26,12 +26,24 @@ class AMyProject415Projectile : public AActor
 	UStaticMeshComponent* BallMesh;
 
 	UPROPERTY(EditAnywhere)
-	UMaterial* BaseMaterial;
+	UMaterial* DecalMaterial;
 
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* ProjectileMaterial;
+
+	UPROPERTY()
+	FLinearColor RandomColor;
+
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
 
 public:
 	AMyProject415Projectile();
 
+protected:
+	virtual void BeginPlay();
+
+public:
 	/** called when projectile hits something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
