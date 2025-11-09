@@ -26,16 +26,13 @@ class AMyProject415Projectile : public AActor
 	UStaticMeshComponent* BallMesh;
 
 	UPROPERTY(EditAnywhere)
-	UMaterial* DecalMaterial;
+	UMaterialInterface* BallMaterial;
 
 	UPROPERTY(EditAnywhere)
-	UMaterialInterface* ProjectileMaterial;
-
+	UMaterial* DecalMaterial;
+	
 	UPROPERTY()
 	FLinearColor RandomColor;
-
-	UPROPERTY()
-	UMaterialInstanceDynamic* DynamicMaterialInstance;
 
 public:
 	AMyProject415Projectile();

@@ -54,11 +54,11 @@ void AMyProject415Projectile::BeginPlay()
 	);
 
 	// Create dynamic material instance and set the color parameter for the ball mesh
-	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(ProjectileMaterial, this);
-	BallMesh->SetMaterial(0, DynamicMaterialInstance);
+	UMaterialInstanceDynamic* BallMeshDMI = UMaterialInstanceDynamic::Create(BallMaterial, this);
+	BallMeshDMI->SetVectorParameterValue(TEXT("Color"), RandomColor);
 
-	// Set the random color parameter for the projectile material
-	DynamicMaterialInstance->SetVectorParameterValue(TEXT("Color"), RandomColor);
+	// Apply the dynamic material to the ball mesh
+	BallMesh->SetMaterial(0, BallMeshDMI);
 }
 
 void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -80,7 +80,7 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 
 		// Spawn decal at hit location
 		auto Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalMaterial, FVector(ranNumSize), Hit.Location, Hit.Normal.Rotation(), 0.f);
-		
+
 		// Create dynamic material instance and set parameters
 		auto MaterialInstance = Decal->CreateDynamicMaterialInstance();
 
