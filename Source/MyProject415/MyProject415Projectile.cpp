@@ -3,6 +3,9 @@
 #include "MyProject415Projectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/DecalComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 AMyProject415Projectile::AMyProject415Projectile() 
@@ -17,8 +20,14 @@ AMyProject415Projectile::AMyProject415Projectile()
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
+	// Create the ball mesh component
+	BallMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BallMesh"));
+
 	// Set as root component
 	RootComponent = CollisionComp;
+
+	// Attach ball mesh to root component
+	BallMesh->SetupAttachment(RootComponent);
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
@@ -40,5 +49,29 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
 		Destroy();
+	}
+
+	// If we hit something, and we have a decal material
+	if (OtherActor != nullptr && BaseMaterial != nullptr)
+	{
+		// Generate random values for color, frame, and size
+		float ranNumX = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
+		float ranNumY = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
+		float ranNumZ = UKismetMathLibrary::RandomFloatInRange(0.0f, 1.0f);
+		float ranNumFrame = UKismetMathLibrary::RandomFloatInRange(0.0f, 3.0f);
+		float ranNumSize = UKismetMathLibrary::RandomFloatInRange(20.0f, 40.0f);
+
+		// Create color vector
+		FVector4 ColorVector = FVector4(ranNumX, ranNumY, ranNumZ, 1.0f);
+		
+		// Spawn decal at hit location
+		auto Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), BaseMaterial, FVector(ranNumSize), Hit.Location, Hit.Normal.Rotation(), 0.f);
+		
+		// Create dynamic material instance and set parameters
+		auto MaterialInstance = Decal->CreateDynamicMaterialInstance();
+
+		// Set decal parameters
+		MaterialInstance->SetVectorParameterValue("Color", ColorVector);
+		MaterialInstance->SetScalarParameterValue("Frame", ranNumFrame);
 	}
 }
