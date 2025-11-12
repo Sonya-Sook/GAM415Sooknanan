@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UNiagaraSystem;
 
 UCLASS(config=Game)
 class AMyProject415Projectile : public AActor
@@ -33,6 +34,9 @@ class AMyProject415Projectile : public AActor
 	
 	UPROPERTY()
 	FLinearColor RandomColor;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ImpactEffect;
 
 public:
 	AMyProject415Projectile();

@@ -6,6 +6,8 @@
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 
 AMyProject415Projectile::AMyProject415Projectile() 
@@ -38,7 +40,7 @@ AMyProject415Projectile::AMyProject415Projectile()
 	ProjectileMovement->bShouldBounce = true;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	InitialLifeSpan = 1.0f;
 }
 
 void AMyProject415Projectile::BeginPlay()
@@ -74,6 +76,21 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	// If we hit something, and we have a decal material
 	if (OtherActor != nullptr && DecalMaterial != nullptr)
 	{
+		if (ImpactEffect != nullptr) {
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+				ImpactEffect,
+				HitComp,
+				NAME_None,
+				FVector(0.f),
+				FRotator(0.f),
+				EAttachLocation::KeepRelativeOffset,
+				true
+			);
+			NiagaraComp->SetVariableLinearColor(TEXT("Color"), RandomColor);
+			BallMesh->DestroyComponent();
+			CollisionComp->BodyInstance.SetCollisionProfileName("NoCollision");
+		}
+
 		// Generate random values for color, frame, and size
 		float ranNumFrame = UKismetMathLibrary::RandomFloatInRange(0.0f, 3.0f);
 		float ranNumSize = UKismetMathLibrary::RandomFloatInRange(20.0f, 40.0f);
