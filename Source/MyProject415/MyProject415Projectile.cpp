@@ -39,7 +39,7 @@ AMyProject415Projectile::AMyProject415Projectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	// Die after 3 seconds by default
+	// Die after 1 seconds by default
 	InitialLifeSpan = 1.0f;
 }
 
@@ -76,7 +76,9 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	// If we hit something, and we have a decal material
 	if (OtherActor != nullptr && DecalMaterial != nullptr)
 	{
+		// If we have an impact effect defined
 		if (ImpactEffect != nullptr) {
+			// Spawn Niagara effect at hit location
 			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 				ImpactEffect,
 				HitComp,
@@ -86,7 +88,11 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 				EAttachLocation::KeepRelativeOffset,
 				true
 			);
+			
+			// Set the color parameter for the Niagara effect
 			NiagaraComp->SetVariableLinearColor(TEXT("Color"), RandomColor);
+			
+			// Destroy the ball mesh and disable collision
 			BallMesh->DestroyComponent();
 			CollisionComp->BodyInstance.SetCollisionProfileName("NoCollision");
 		}
