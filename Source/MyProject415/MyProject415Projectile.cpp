@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "PerlinProcTerrain.h"
 
 
 AMyProject415Projectile::AMyProject415Projectile() 
@@ -110,5 +111,13 @@ void AMyProject415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 		// Set decal parameters
 		MaterialInstance->SetVectorParameterValue(TEXT("Color"), RandomColor);
 		MaterialInstance->SetScalarParameterValue(TEXT("Frame"), ranNumFrame);
+
+		// Try to cast the other actor to APerlinProcTerrain
+		APerlinProcTerrain* Terrain = Cast<APerlinProcTerrain>(OtherActor);
+		if (Terrain)
+		{
+			// If the cast is successful, call AfterMesh on the terrain
+			Terrain->AfterMesh(Hit.ImpactPoint);
+		}
 	}
 }
