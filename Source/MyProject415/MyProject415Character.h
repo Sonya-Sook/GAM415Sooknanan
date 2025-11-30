@@ -44,6 +44,10 @@ class AMyProject415Character : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isTeleporting;
 	
 public:
 	AMyProject415Character();
